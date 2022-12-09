@@ -1,5 +1,10 @@
 <?php
 require_once ('connect.php');
+session_start();
+if (!isset($_SESSION['tuvastamine'])) {
+    header('Location: ab_login.php');
+    exit();
+}
 //punktid nulliks
 if(isSet($_REQUEST['punkt0'])){
     global $yhendus;
@@ -34,6 +39,12 @@ UPDATE tantsud SET avalik=1 WHERE id=?');
 </head>
 <body>
 <header>
+    <div>
+        <?=$_SESSION['kasutaja']?> on sisse logitud
+        <form action="logout.php" method="post">
+            <input type="submit" value="Logi välja" name="logout">
+        </form>
+    </div>
     <h1>Tantsud TARpv21</h1>
     <h2>Administraatori leht</h2>
     <nav>

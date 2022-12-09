@@ -1,7 +1,22 @@
 <?php
 require_once ('connect.php');
+// sessiooni algus
+session_start();
+if (!isset($_SESSION['tuvastamine'])) {
+    header('Location: ab_login.php');
+    exit();
+}
+//if($_SESSION['onAdmin']){
+
+//}
+
+
+// tagastab isAdmin session
+function isAdmin(){
+    return isset($_SESSION['onAdmin'])&&$_SESSION['onAdmin'];
+}
 //Uue tantsupaari lisamine
-if (!empty($_REQUEST['paarinimi'])) {
+if (!empty($_REQUEST['paarinimi']) && isAdmin()) {
     global $yhendus;
     $kask=$yhendus->prepare("
     INSERT INTO tantsud (tantsupaar, avaliku_paev)
@@ -42,6 +57,12 @@ UPDATE tantsud SET punktid=punktid+1 WHERE id=?');
 </head>
 <body>
 <header>
+    <div>
+        <?=$_SESSION['kasutaja']?> on sisse logitud
+        <form action="logout.php" method="post">
+            <input type="submit" value="Logi välja" name="logout">
+        </form>
+    </div>
 <h1>Tantsud TARpv21</h1>
     <h2>Kasutaja leht</h2>
     <nav>
@@ -80,23 +101,27 @@ SELECT id, tantsupaar, punktid, kommentaarid FROM tantsud Where avalik=1');
         echo "<td><a href='?punkt=$id'>Lisa 1punkt</a></td>";
         $kommentaarid=nl2br(htmlspecialchars($kommentaarid));
         echo "<td>".$kommentaarid."</td>";
-        echo "<td>
+
+            echo "<td>
+
 <form action='?'>
 <input type='hidden' value='$id' name='uuskomment'>
 <input type='text' name='komment'>
 <input type='submit' value='OK'>
 </form>
 </td>";
+
         echo "</tr>";
     }
     ?>
 </table>
-
-<div>
-    <h2>Uue tantsupaari lisamine</h2>
-    <form action="?">
-        <input type="text" placeholder="Tansupaari nimed" name="paarinimi">
-        <input type="submit" value="OK">
-    </form>
-</div>
+<?php if(isAdmin()) { ?>
+    <div>
+    <h2 > Uue tantsupaari lisamine </h2 >
+    <form action = "?" >
+        <input type = "text" placeholder = "Tansupaari nimed" name = "paarinimi" >
+        <input type = "submit" value = "OK" >
+    </form >
+</div >
+  <?php  } ?>
 </body>
